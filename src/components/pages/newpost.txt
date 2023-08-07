@@ -1,0 +1,312 @@
+import { useState, useRef, useEffect} from "react";
+import {useDropzone} from 'react-dropzone';
+import {Link} from 'react-router-dom';
+import {BsArrowLeftShort} from 'react-icons/bs';
+import {FaCross} from 'react-icons/fa';
+import {BiDownload} from 'react-icons/bi';
+import {AiOutlineDelete} from 'react-icons/ai';
+import {ImEmbed} from 'react-icons/im';
+// import {React} from "react";
+
+import axios from "axios";
+
+const thumbsContainer = {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 16
+  };
+  
+  const thumb = {
+    display: 'inline-flex',
+    borderRadius: 2,
+    border: '1px solid #eaeaea',
+    marginBottom: 8,
+    marginRight: 8,
+    width: 100,
+    height: 100,
+    padding: 4,
+    boxSizing: 'border-box'
+  };
+  
+  const thumbInner = {
+    display: 'flex',
+    minWidth: 0,
+    overflow: 'hidden'
+  };
+  
+  const img = {
+    display: 'block',
+    width: '100%',
+    height: '100%'
+  };
+
+function Newpost() {
+  const [options, setOptions] =useState();
+  const [values, setValues] =useState([]);
+  const [err, setErr] = useState(false);
+  // const [ tag, setTag] = useState([])
+  const [title, setTitle] =useState("");
+    const [tag, setTag] = useState("");
+    const [description, setDescription] = useState("");
+    const [image, setImage] = useState("");
+  const [post, setPost] = useState({
+    title: "",
+    avatar: "",
+    description: "",
+    tag: "",
+ });
+
+//  useEffect(()=>{
+//   fetch('http://localhost:3007/tag').then(res=> res.json()).then(res => {
+//       return setTag(res) 
+//   })
+// },[])
+
+useEffect(() => {
+  console.log('I restarted');
+  fetch("http://localhost:3007/tag",)
+  .then((data) => data.json())
+  .then((val) => {
+    setValues(val);
+  });
+
+},[]);
+
+
+
+//  const submitForm = (e) => {
+//   e.preventDefault();
+//   const postData = {
+//       title: post.title,
+//       avatar: post.avatar,
+//       description: post.description,
+//       tag: post.tag,
+//   };
+//   console.log(postData)
+
+//   if ( post.title ==="" || post.avatar ==="" || post.description ==="" || post.tag ==="" ){
+//     setErr(true);
+//   }else {
+//       axios.post("http://localhost:3007/post", postData)
+//       .then((resp) => {
+//           console.log(resp.data)
+//           .catch((error) => {console.error(error);})
+//           let response = resp.data.error
+//           // if (response){
+//           //     alert("User exist")
+//           // }else {
+//           //    alert("Registered Succesfully")
+//           // }
+       
+//       })
+//       // setUser({
+//       //     username: "",
+//       //     email: "",
+//       //     password: "",
+//       //     phoneNumber: "",
+//       // });
+//       // setErr(false);
+//       // navigate("/signin");
+      
+//   }
+// };
+
+const check =async() => {
+  // e.preventdefault();
+  console.log('Request Started');
+let formdata = new FormData()
+formdata.append('title', title);
+formdata.append('tag', tag);
+formdata.append('description', description);
+formdata.append('image', image);
+console.log("form data",formdata.get('image'));
+//  return false;
+let response = await fetch("http://localhost:3007/post",{
+method:"Post",
+body:formdata,
+// headers:{
+//   'Content-Type':"multipart/form-data",
+// }
+});
+if(response.status === 200){
+alert("Post created");
+
+}
+console.log('response',response.data);
+
+}
+
+
+   
+
+    const [files, setFiles] = useState([]);
+    const {getRootProps, getInputProps} = useDropzone({
+      accept: {
+        'image/*': []
+      },
+      onDrop: acceptedFiles => {
+        setFiles(acceptedFiles.map(file => Object.assign(file, {
+          preview: URL.createObjectURL(file)
+        })));
+      }
+    });
+    
+    const thumbs = files.map(file => (
+      <div style={thumb} key={file.name}>
+        <div style={thumbInner}>
+          <img
+            src={file.preview}
+            style={img}
+            // Revoke data uri after image is loaded
+            onLoad={() => { URL.revokeObjectURL(file.preview) }}
+          />
+        </div>
+      </div>
+    ));
+  
+    useEffect(() => {
+      // Make sure to revoke the data uris to avoid memory leaks, will run on unmount
+      return () => files.forEach(file => URL.revokeObjectURL(file.preview));
+    }, []);
+
+
+
+     // drag state
+  const [dragActive, setDragActive] = useState(false);
+  // ref
+  const inputRef = useRef(null);
+  
+  // handle drag events
+  const handleDrag = function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+  
+  // triggers when file is dropped
+  const handleDrop = function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const image=e.target.files[0]
+    setImage(image)
+    console.log(image)
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      // handleFiles(e.dataTransfer.files);
+    }
+  };
+  
+  // triggers when file is selected with click
+  const handleChange = function(e) {
+    e.preventDefault();
+    if (e.target.files && e.target.files[0]) {
+      // handleFiles(e.target.files);
+    }
+  };
+  
+// triggers the input when the button is clicked
+  const onButtonClick = () => {
+    inputRef.current.click();
+  };
+  
+    return (
+      <section className="container">
+         
+        <div className='navBar'>
+          <div className='flex'>
+            {/* <div><img className="logo" src={logo} alt=""/></div> */}
+            <div className="logo"><Link to="/" className='td'>imgur</Link></div>
+            {/* <div><button><Link to="/newpost" className='newpost'>New post</Link></button></div> */}
+          </div>
+
+          {/* <div> <input type='text' placeholder="Images, #tags, @users oh my!" /></div> */}
+
+          <div className='flex'>
+            <div><button className='navBar-btn'>Go Ad-Free</button></div>
+            <h2 className='navBar-signin'><Link to="/signin" className='newpost'>Sign In</Link></h2>
+            <div><button><Link to="/signup" className='newpost'>Sign Up</Link></button></div>
+
+          
+          </div>
+
+        </div>
+
+        <form className="grid-2" onSubmit={(e)=>{e.preventDefault();}} onDragEnter={handleDrag} >
+            <div className="container1">
+
+                <div className="input-title"> <input type="text"  placeholder="Give your post a unique title..." onChange={(e)=>setTitle(e.target.value)} /></div>
+
+                {/* <div className="dropzones" {...getRootProps({className: 'dropzone'})}>
+                    <input type="file" onDrop={handleDrop} onChange={(e) => setImage(e.target.files[0])}{...getInputProps()} />
+                    <p>Drag 'n' drop some files here, or click to select files
+                    <aside style={thumbsContainer}>
+                 {thumbs}
+                </aside>
+                    </p>
+                    
+                </div> */}
+                   <input type="file" id="image" name="image" onChange={(e)=>setImage(e.target.files[0])} />
+                
+
+
+{/* <input ref={inputRef} type="file" id="input-file-upload" multiple={true}  vaue={post.avatar} onChange={(e) => setPost({...post, avatar: e.target.})}/> */}
+     {/* <input ref={inputRef} type="file" id="input-file-upload" multiple={true} value={post.avatar } onChange={(e) => setPost({...post, avatar: e.target.file})}/>
+      <label id="label-file-upload" htmlFor="input-file-upload" className={dragActive ? "drag-active" : "" }>
+        <div>
+          <p>Drag and drop your file here or</p>
+          <button className="upload-button" onClick={onButtonClick}>Upload a file</button>
+        </div> 
+      </label>
+      { dragActive && <div id="drag-file-element" onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}></div> } */}
+
+                <div className="input-title2"> <input type="text"  placeholder="Add a description" onChange={(e)=>setDescription(e.target.value)} /></div>
+                {/* <button className="Button Button-community">To Community</button> */}
+            </div>
+
+            <div className="container2">
+              <div className="poost"><p>Post</p></div>
+              <div className="postOptions">
+                <button className="Button Button-community" onClick={check}>To Community</button>
+                <button className="Button Button-grabLink">Grab Link</button>
+                <p className="postStatus"> Your post is currently Hidden</p>
+
+                <div className="checkbox-tag flex">
+                    <label><input className="checkbox" type="checkbox"/></label>
+                    <label className="mature">Mature (?)</label>
+
+                </div>
+
+                <div className="add-tags">Add Tags</div>
+                {/* <div className='cross-tag'><FaCross/> Tag</div> */}
+                {/* <input type="text" className="tag-in" value={post.tag} placeholder=" Tag" onChange={(e) => setPost({...post, tag: e.target.value})} /> */}
+                <select name="tag" onChange={(e)=>setTag(e.target.value)}>
+              {
+                values.map((opts,i) => <option key={i} value={opts._id}>{opts.title}</option>)
+              }
+            </select>
+                </div>
+
+                <div className="add-tags">IMG TOOLS</div>
+                
+               
+                <div className='span-tag'><span className='span-tag'><FaCross/></span>Add more images</div>
+                <div className='span-tag'><span><ImEmbed/> </span>Embed post</div>
+                <div className='span-tag'><span><BiDownload/> </span>Down post</div>
+                <div className='span-tags'><span><AiOutlineDelete/> </span>Delete post</div>
+                
+                    
+              </div>
+            {/* </div> */}
+        </form>
+      </section>
+    );
+  }
+  
+
+ 
+  export default Newpost;

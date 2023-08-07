@@ -1,0 +1,438 @@
+import React from "react";
+import img6 from '../../images/bk-img-1.jpg';
+import {FaArrowDown, FaGoogle} from 'react-icons/fa';
+import {FaYahoo} from 'react-icons/fa';
+import {FaComment} from 'react-icons/fa';
+import {FaEye} from 'react-icons/fa';
+import {ImArrowDown} from 'react-icons/im';
+import {ImArrowUp} from 'react-icons/im';
+// import {RiBarcodeBoxLine} from 'react-icons/ri';
+// import riri from "../../images/20230203_120804.jpg"
+// import wenger from "../../images/20230206_185404.jpg"
+// import tweet from "../../images/YOEM8fV_d.webp"
+// import tweet2 from "../../images/WSI8seB_d.webp"
+// import tweet3 from "../../images/qK7lMso_d.webp"
+// import tweet4 from "../../images/ThcBJMG_d.webp"
+// import tweet5 from "../../images/ThcBJMG_d.webp"
+// import {FaArrowDown} from 'react-icons/fa';
+import {Link} from 'react-router-dom';
+import { useEffect, useState } from "react";
+import axios from "axios";
+import {useParams} from "react-router-dom";
+
+// export const subject = [
+//     {
+//         id: 1,
+//         img: tweet,
+//         lastName: "Plus eyes are horny when they are comfortable",
+        
+//     },
+//     {
+//        id:2,
+//        img: tweet2,
+//        lastName: "I'm Your Father",
+      
+//     },
+//     {
+//         id:3,
+//         img: tweet3,
+//         lastName: "I approve and support this image",
+       
+//      },
+//      {
+//         id:4,
+//         img: tweet4,
+//         lastName: "Term limits. Yes,but, for all of government",
+       
+//      },
+//      {
+//         id:5,
+//         img: tweet5,
+//         lastName: "Take your Monday memes hereeee",
+       
+//      },
+// ];
+
+function Posts(){
+
+    const [dislike, setDislike] = useState();
+    const [likes, setLikes] = useState()
+    const [userID, setUserID] = useState({})
+ 
+    const { _id } = useParams();
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch("http://localhost:3007/post")
+        .then((resp) => resp.json())
+        .then((data) => {
+            // console.log('data',data);
+            setProducts(data);
+            setLoading(false)
+        });
+
+        
+    },[]);
+    // console.log(products)
+    async   function LikePost(a){
+      const loggedin = {
+        user:userID.id
+      }
+      console.log(userID.id)
+         try{
+           await  axios.put('http://localhost:3007/likes/'+ a, loggedin ).then(res=>{
+              console.log(res)
+              if(res.status === 200){
+                alert("post has been liked")
+              }
+            
+            })
+         }catch(err){
+          console.log(err)
+         }
+         console.log(loggedin);
+         
+    };
+    
+   async function UnLikePost(a){
+    const loggedin = {
+      user:userID.id
+    }
+     
+        try {
+          await    axios.put('http://localhost:3007/unlike/'+ a, loggedin).then(res=>{
+              console.log(res)
+              if(res.status === 200){
+                alert("you just unliked this post")
+                
+              }
+            })
+        } catch (error) {
+          console.log(error);
+        }
+    }
+
+    const LikeAmount = (a) =>{
+      setLikes(a)
+    }
+
+    useEffect(() => {
+      if(localStorage){
+        let rawData = localStorage.getItem("Imgur_USER")
+        let localData = JSON.parse(rawData)
+        setUserID(localData)
+      }
+      console.log('I restarted');
+      
+    
+    },[]);
+
+    
+    console.log(userID.data.id);
+    return (
+        <div className="post-bk">
+            <div className="ddd">
+                {loading ? (
+                    <div>Data Loading, please wait....</div>
+                ) : (
+                    products.map((product) =>{
+                        // console.log('product',product)
+                        return  (
+                            
+                            <div className="posts-grid">
+                                <div key={product._id} className="bkk"  >
+                                   <div className="shopComputer-product">
+                                        <Link to={`/commentPost/${product._id}`} className="post-bk">
+                                            <h2 className="flexx">{product.title ?? ''}</h2>
+                                            <img src={product.image} alt="images" />
+                                            <p>{product.description}</p>
+                                            <p> {product.tag?.title ?? ''}</p>
+                                        </Link>
+                                        <div className="flexx">
+                                            <div className="flexy">
+                                                <ImArrowUp onClick={()=>LikePost(product._id)}/>
+                                                <div>{product.likes.length}</div>
+                                                <ImArrowDown onClick={()=>UnLikePost(product._id)}/>
+                                            </div>
+
+                                            <div><FaComment /> 44</div>
+                                            <div><FaEye /> 12</div>
+                                        </div>
+                                        
+                                   </div>
+                                </div>
+                            </div>
+                           
+    
+                            
+            
+                           )
+                    })
+                )}
+            </div>
+        </div>
+
+          
+         
+        //  subject.map(function(subjects){
+        //      return(
+        //         <Link to="/comment" className="post-bk" >
+        //              {/* <img src={subjects.img} alt="" />
+        //              <p>{subjects.lastName}</p>
+        //              <p>{subjects.name}</p> */}
+        //             <div className="posts-grid">
+                
+        //                 <div className="ddd">
+        //                     <div key={subjects.id} className="bkk"> 
+        //                         <div><img src={subjects.img} alt="" /></div>
+        //                         <p> {subjects.lastName}</p>
+        //                         <div className="flexx">
+        //                         <div className="flexy">
+        //                     <FaGoogle />
+        //                     <div>473</div>
+        //                     <FaYahoo />
+        //                     </div>
+
+        //                     <div><FaComment /> 44</div>
+        //                     <div><FaEye /> 12</div>
+                   
+                        
+                        
+        //                     </div>
+        //                     </div>
+        //                 </div>
+        //             </div>
+        //         </Link>
+
+                 
+        //      )
+        //  }) 
+
+       
+          
+     )
+
+    // return(
+       
+
+    //     <div className="post-bk">
+
+    //         <div className="drop-tag">
+    //             <div><div>MOST VIRAL </div></div>
+    //             <div className="flex">
+    //                 <div>NEWEST</div>
+    //                 <FaGoogle />
+    //                 <FaYahoo />
+    //                 <RiBarcodeBoxLine/>
+    //             </div>
+    //         </div>
+    //         <div className="posts-grid">
+    //         <div>
+                
+    //             <div className="bkk"> 
+    //                 <Link to="/comment" className='newpost'><div><img src={tweet} alt="" /></div>
+    //                 <p> Plus eyes are horny when they are comfortable</p></Link>
+    //                 <div className="flexx">
+    //                     <div className="flexy">
+    //                         <ImArrowUp />
+    //                         <div>473</div>
+    //                         <ImArrowDown/>
+    //                     </div>
+
+    //                     <div><FaComment /> 44</div>
+    //                     <div><FaEye /> 12</div>
+                   
+                        
+                        
+    //                 </div>
+    //            </div>
+    //         </div>
+
+    //         <div>
+                
+    //             <div className="bkk"> 
+    //             <Link to="/viewcomment" className='newpost'><div><img src={tweet2} alt="" /></div>
+    //                 <p> I'm Your Father</p></Link>
+    //                 <div className="flexx">
+    //                     <div className="flexy">
+    //                         <FaGoogle />
+    //                         <div>473808308</div>
+    //                         <FaYahoo />
+    //                     </div>
+
+    //                     <div><FaComment /> 44</div>
+    //                     <div><FaEye /> 12</div>
+                   
+                        
+                        
+    //                 </div>
+    //            </div>
+    //         </div>
+
+    //         <div>
+                
+    //             <div className="bkk"> 
+    //                 <div><img src={tweet3} alt="" /></div>
+    //                 <p> I approve and support this image</p>
+    //                 <div className="flexx">
+    //                     <div className="flexy">
+    //                         <FaGoogle />
+    //                         <div>473808308</div>
+    //                         <FaYahoo />
+    //                     </div>
+
+    //                     <div><FaComment /> 44</div>
+    //                     <div><FaEye /> 12</div>
+                   
+                        
+                        
+    //                 </div>
+    //            </div>
+    //         </div>
+
+    //         <div>
+                
+    //             <div className="bkk"> 
+    //                 <div><img src={wenger} alt="" /></div>
+    //                 <p> I approve and support this image</p>
+    //                 <div className="flexx">
+    //                     <div className="flexy">
+    //                         <FaGoogle />
+    //                         <div>473808308</div>
+    //                         <FaYahoo />
+    //                     </div>
+
+    //                     <div><FaComment /> 44</div>
+    //                     <div><FaEye /> 12</div>
+                   
+                        
+                        
+    //                 </div>
+    //            </div>
+    //         </div>
+
+    //         <div>
+                
+    //             <div className="bkk"> 
+    //                 <div><img src={riri} alt="" /></div>
+    //                 <p> I approve and support this image</p>
+    //                 <div className="flexx">
+    //                     <div className="flexy">
+    //                         <FaGoogle />
+    //                         <div>473808308</div>
+    //                         <FaYahoo />
+    //                     </div>
+
+    //                     <div><FaComment /> 44</div>
+    //                     <div><FaEye /> 12</div>
+                   
+                        
+                        
+    //                 </div>
+    //            </div>
+    //         </div>
+
+    //         <div>
+                
+    //             <div className="bkk"> 
+    //                 <div><img src={tweet3} alt="" /></div>
+    //                 <p> I approve and support this image</p>
+    //                 <div className="flexx">
+    //                     <div className="flexy">
+    //                         <FaGoogle />
+    //                         <div>473808308</div>
+    //                         <FaYahoo />
+    //                     </div>
+
+    //                     <div><FaComment /> 44</div>
+    //                     <div><FaEye /> 12</div>
+                   
+                        
+                        
+    //                 </div>
+    //            </div>
+    //         </div>
+
+    //         </div>
+
+    //     </div>
+
+        
+          
+    // )
+
+  
+}
+export default Posts;
+
+
+<div className='trending-container'>
+          <div className='grid'>
+            <div>
+            <div><img className="trending-img1" src={img} alt=""/></div>
+            <div className='tag-tittle'>
+            <Link to={`/postcategory/{}`}><div className='tag-name'>Sport</div>
+            <div className='tag-posts'>FEATURED +  Posts</div></Link>
+            </div>
+            </div>
+
+            <div>
+            <div><img className="trending-img" src={img2} alt=""/></div>
+            <div className='tag-tittle'>
+            <div className='tag-name'>Politics</div>
+            <div className='tag-posts'> 1,549 Posts</div>
+            </div>
+            </div>
+
+            <div>
+            <div><img className="trending-img" src={img3} alt=""/></div>
+            <div className='tag-tittle'>
+            <div className='tag-name'>Beauty</div>
+            <div className='tag-posts'> 1,549 Posts</div>
+            </div>
+            </div>
+
+            <div>
+            <div><img className="trending-img" src={img4} alt=""/></div>
+            <div className='tag-tittle'>
+            <div className='tag-name'>Funny</div>
+            <div className='tag-posts'> 1,549 Posts</div>
+            </div>
+            </div>
+
+            <div>
+            <div><img className="trending-img" src={img5} alt=""/></div>
+            <div className='tag-tittle'>
+            <div className='tag-name'>Health</div>
+            <div className='tag-posts'> 1,549 Posts</div>
+            </div>
+            </div>
+
+            <div>
+            <div><img className="trending-img" src={img2} alt=""/></div>
+            <div className='tag-tittle'>
+            <div className='tag-name'>Movies</div>
+            <div className='tag-posts'> 1,549 Posts</div>
+            </div>
+            </div>
+
+            <div>
+            <div><img className="trending-img" src={img6} alt=""/></div>
+            <div className='tag-tittle'>
+            <div className='tag-name'>Music</div>
+            <div className='tag-posts'> 1,549 Posts</div>
+            </div>
+            </div>
+
+            <div>
+            <div><img className="trending-img" src={img7} alt=""/></div>
+            <div className='tag-tittle'>
+            <div className='tag-name'>Photography</div>
+            <div className='tag-posts'> 1,549 Posts</div>
+            </div>
+            </div>
+
+           
+          </div>
+        </div>
